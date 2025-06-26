@@ -5,7 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+
     <AssemblyTitle>崔子瑾诱捕器</AssemblyTitle>
     <AssemblyDescription>网站访问控制管理工具</AssemblyDescription>
     <AssemblyCompany>崔子瑾诱捕器</AssemblyCompany>
