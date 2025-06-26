@@ -12,10 +12,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
 
@@ -56,19 +56,19 @@ jobs:
         Compress-Archive -Path "publish/framework-dependent/*" -DestinationPath "崔子瑾诱捕器-v1.0.0-依赖框架版本.zip"
 
     - name: Upload Self-Contained Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: 崔子瑾诱捕器-自包含版本
         path: 崔子瑾诱捕器-v1.0.0-自包含版本.zip
 
     - name: Upload Framework-Dependent Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: 崔子瑾诱捕器-依赖框架版本
         path: 崔子瑾诱捕器-v1.0.0-依赖框架版本.zip
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-outputs
         path: |
