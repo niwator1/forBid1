@@ -125,6 +125,9 @@ namespace 崔子瑾诱捕器.Services
 
                 // 写入文件
                 await File.WriteAllTextAsync(_hostsFilePath, content, Encoding.UTF8);
+
+                // 清理DNS缓存以确保更改立即生效
+                FlushDnsCache();
             }
             catch (Exception ex)
             {
@@ -163,10 +166,10 @@ namespace 崔子瑾诱捕器.Services
             foreach (var website in blockedWebsites)
             {
                 var url = website.Url.ToLowerInvariant();
-                
+
                 // 移除协议前缀
                 url = url.Replace("http://", "").Replace("https://", "");
-                
+
                 // 移除路径部分
                 var slashIndex = url.IndexOf('/');
                 if (slashIndex > 0)
@@ -174,16 +177,131 @@ namespace 崔子瑾诱捕器.Services
                     url = url.Substring(0, slashIndex);
                 }
 
-                // 添加主域名和www子域名
-                sb.AppendLine($"{LOCALHOST_IP}\t{url}");
-                if (!url.StartsWith("www."))
+                // 移除端口号
+                var colonIndex = url.IndexOf(':');
+                if (colonIndex > 0)
                 {
-                    sb.AppendLine($"{LOCALHOST_IP}\twww.{url}");
+                    url = url.Substring(0, colonIndex);
+                }
+
+                // 生成更全面的阻止条目
+                var domains = GenerateDomainsToBlock(url);
+                foreach (var domain in domains)
+                {
+                    sb.AppendLine($"{LOCALHOST_IP}\t{domain}");
                 }
             }
 
             sb.AppendLine(BLOCK_COMMENT_END);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// 生成需要阻止的域名列表
+        /// </summary>
+        private List<string> GenerateDomainsToBlock(string domain)
+        {
+            var domains = new List<string>();
+
+            // 添加原始域名
+            domains.Add(domain);
+
+            // 添加www子域名
+            if (!domain.StartsWith("www."))
+            {
+                domains.Add($"www.{domain}");
+            }
+
+            // 添加常见子域名
+            var commonSubdomains = new[]
+            {
+                "m", "mobile", "app", "api", "cdn", "static", "assets",
+                "img", "images", "media", "video", "audio", "download",
+                "mail", "email", "login", "auth", "account", "user",
+                "admin", "dashboard", "panel", "console", "manage",
+                "blog", "news", "support", "help", "docs", "wiki",
+                "shop", "store", "pay", "payment", "checkout",
+                "search", "analytics", "tracking", "ads", "ad"
+            };
+
+            foreach (var subdomain in commonSubdomains)
+            {
+                domains.Add($"{subdomain}.{domain}");
+            }
+
+            // 如果是知名网站，添加特定的子域名
+            if (domain.Contains("youtube.com") || domain.Contains("youtu.be"))
+            {
+                domains.AddRange(new[]
+                {
+                    "youtube.com", "www.youtube.com", "m.youtube.com",
+                    "youtu.be", "www.youtu.be",
+                    "youtubei.googleapis.com", "youtube.googleapis.com",
+                    "yt3.ggpht.com", "ytimg.com", "i.ytimg.com"
+                });
+            }
+            else if (domain.Contains("facebook.com") || domain.Contains("fb.com"))
+            {
+                domains.AddRange(new[]
+                {
+                    "facebook.com", "www.facebook.com", "m.facebook.com",
+                    "fb.com", "www.fb.com", "fbcdn.net", "facebook.net"
+                });
+            }
+            else if (domain.Contains("twitter.com") || domain.Contains("x.com"))
+            {
+                domains.AddRange(new[]
+                {
+                    "twitter.com", "www.twitter.com", "mobile.twitter.com",
+                    "x.com", "www.x.com", "t.co", "twimg.com"
+                });
+            }
+            else if (domain.Contains("instagram.com"))
+            {
+                domains.AddRange(new[]
+                {
+                    "instagram.com", "www.instagram.com",
+                    "cdninstagram.com", "instagramstatic-a.akamaihd.net"
+                });
+            }
+            else if (domain.Contains("tiktok.com"))
+            {
+                domains.AddRange(new[]
+                {
+                    "tiktok.com", "www.tiktok.com", "m.tiktok.com",
+                    "tiktokcdn.com", "musical.ly"
+                });
+            }
+
+            return domains.Distinct().ToList();
+        }
+
+        /// <summary>
+        /// 清理DNS缓存
+        /// </summary>
+        private void FlushDnsCache()
+        {
+            try
+            {
+                var process = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "ipconfig",
+                        Arguments = "/flushdns",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+            }
+            catch
+            {
+                // 忽略DNS缓存清理错误
+            }
         }
 
         /// <summary>
