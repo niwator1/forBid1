@@ -1,6 +1,18 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- 全局颜色定义 -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#007AFF"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="#5856D6"/>
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#F2F2F7"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8E8E93"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#C6C6C8"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="#34C759"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="#FF3B30"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#FF9500"/>
+
     <!-- 苹果风格窗口样式 -->
     <Style x:Key="AppleWindowStyle" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
