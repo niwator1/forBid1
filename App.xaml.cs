@@ -24,7 +24,7 @@ namespace 崔子瑾诱捕器
             // 检查是否以管理员权限运行
             if (!PermissionService.IsRunAsAdministrator())
             {
-                MessageBox.Show("此应用程序需要管理员权限才能运行。\n请右键点击应用程序并选择"以管理员身份运行"。",
+                MessageBox.Show("此应用程序需要管理员权限才能运行。\n请右键点击应用程序并选择\"以管理员身份运行\"。",
                     "需要管理员权限", MessageBoxButton.OK, MessageBoxImage.Warning);
                 Shutdown();
                 return;
