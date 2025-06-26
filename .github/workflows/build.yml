@@ -49,23 +49,23 @@ jobs:
 
     - name: Create Self-Contained Archive
       run: |
-        Compress-Archive -Path "publish/self-contained/*" -DestinationPath "崔子瑾诱捕器-v1.0.0-自包含版本.zip"
+        Compress-Archive -Path "publish/self-contained/*" -DestinationPath "WebsiteBlocker-v1.0.0-SelfContained.zip"
 
     - name: Create Framework-Dependent Archive
       run: |
-        Compress-Archive -Path "publish/framework-dependent/*" -DestinationPath "崔子瑾诱捕器-v1.0.0-依赖框架版本.zip"
+        Compress-Archive -Path "publish/framework-dependent/*" -DestinationPath "WebsiteBlocker-v1.0.0-FrameworkDependent.zip"
 
     - name: Upload Self-Contained Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: 崔子瑾诱捕器-自包含版本
-        path: 崔子瑾诱捕器-v1.0.0-自包含版本.zip
+        name: WebsiteBlocker-SelfContained
+        path: WebsiteBlocker-v1.0.0-SelfContained.zip
 
     - name: Upload Framework-Dependent Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: 崔子瑾诱捕器-依赖框架版本
-        path: 崔子瑾诱捕器-v1.0.0-依赖框架版本.zip
+        name: WebsiteBlocker-FrameworkDependent
+        path: WebsiteBlocker-v1.0.0-FrameworkDependent.zip
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
