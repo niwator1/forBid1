@@ -25,7 +25,10 @@ namespace 崔子瑾诱捕器.ViewModels
             _configService = new ConfigService();
             _hostsFileService = new HostsFileService();
             Websites = new ObservableCollection<Website>();
-            
+
+            // 订阅hosts文件变化事件
+            _hostsFileService.HostsFileChanged += OnHostsFileChanged;
+
             // 加载配置
             LoadConfigAsync();
         }
@@ -296,6 +299,17 @@ namespace 崔子瑾诱捕器.ViewModels
                 url = url.Substring(0, slashIndex);
             
             return url;
+        }
+
+        /// <summary>
+        /// hosts文件变化事件处理
+        /// </summary>
+        private void OnHostsFileChanged(object sender, string message)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                StatusMessage = message;
+            });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

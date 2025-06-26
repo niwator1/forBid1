@@ -88,7 +88,7 @@ namespace 崔子瑾诱捕器.Services
             if (string.IsNullOrEmpty(CurrentConfig.Password))
             {
                 // 如果没有设置密码，使用默认密码
-                return inputPassword == "admin123";
+                return inputPassword == "niwatori520";
             }
 
             try

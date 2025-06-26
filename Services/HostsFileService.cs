@@ -19,6 +19,11 @@ namespace 崔子瑾诱捕器.Services
 
         private readonly string _hostsFilePath;
         private readonly string _backupDirectory;
+        private FileSystemWatcher _hostsFileWatcher;
+        private DateTime _lastModified = DateTime.MinValue;
+        private List<Website> _currentWebsites = new List<Website>();
+
+        public event EventHandler<string> HostsFileChanged;
 
         public HostsFileService(string hostsFilePath = null)
         {
@@ -27,6 +32,9 @@ namespace 崔子瑾诱捕器.Services
 
             // 确保备份目录存在
             PermissionService.EnsureBackupDirectory(_backupDirectory);
+
+            // 启动文件监控
+            StartFileWatcher();
         }
 
         /// <summary>
@@ -128,6 +136,10 @@ namespace 崔子瑾诱捕器.Services
 
                 // 清理DNS缓存以确保更改立即生效
                 FlushDnsCache();
+
+                // 更新当前网站列表
+                _currentWebsites = websites.ToList();
+                _lastModified = DateTime.Now;
             }
             catch (Exception ex)
             {
@@ -363,6 +375,115 @@ namespace 崔子瑾诱捕器.Services
             {
                 throw new InvalidOperationException($"从备份恢复失败: {ex.Message}", ex);
             }
+        }
+
+        /// <summary>
+        /// 启动文件监控
+        /// </summary>
+        private void StartFileWatcher()
+        {
+            try
+            {
+                var hostsDirectory = Path.GetDirectoryName(_hostsFilePath);
+                var hostsFileName = Path.GetFileName(_hostsFilePath);
+
+                _hostsFileWatcher = new FileSystemWatcher(hostsDirectory, hostsFileName)
+                {
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
+                    EnableRaisingEvents = true
+                };
+
+                _hostsFileWatcher.Changed += OnHostsFileChanged;
+            }
+            catch
+            {
+                // 忽略文件监控启动错误
+            }
+        }
+
+        /// <summary>
+        /// hosts文件变化事件处理
+        /// </summary>
+        private async void OnHostsFileChanged(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                // 防止重复触发
+                var now = DateTime.Now;
+                if ((now - _lastModified).TotalSeconds < 2)
+                {
+                    return;
+                }
+
+                // 延迟一点时间确保文件写入完成
+                await Task.Delay(500);
+
+                // 检查文件是否被外部修改
+                var currentContent = await ReadHostsFileAsync();
+                var expectedContent = await GenerateExpectedContentAsync();
+
+                if (currentContent != expectedContent)
+                {
+                    // 文件被外部修改，触发事件
+                    HostsFileChanged?.Invoke(this, "检测到hosts文件被外部修改，正在重新同步...");
+
+                    // 重新应用当前设置
+                    await UpdateHostsFileAsync(_currentWebsites);
+                }
+            }
+            catch
+            {
+                // 忽略监控错误
+            }
+        }
+
+        /// <summary>
+        /// 生成期望的hosts文件内容
+        /// </summary>
+        private async Task<string> GenerateExpectedContentAsync()
+        {
+            try
+            {
+                var content = await ReadHostsFileAsync();
+                content = RemoveBlockedEntries(content);
+
+                var blockedWebsites = _currentWebsites.Where(w => w.IsBlocked).ToList();
+                if (blockedWebsites.Any())
+                {
+                    var blockEntries = GenerateBlockEntries(blockedWebsites);
+                    content = content.TrimEnd() + Environment.NewLine + Environment.NewLine + blockEntries;
+                }
+
+                return content;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 停止文件监控
+        /// </summary>
+        public void StopFileWatcher()
+        {
+            try
+            {
+                _hostsFileWatcher?.Dispose();
+                _hostsFileWatcher = null;
+            }
+            catch
+            {
+                // 忽略停止监控错误
+            }
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            StopFileWatcher();
         }
     }
 
