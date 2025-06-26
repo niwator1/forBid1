@@ -76,7 +76,7 @@ namespace 崔子瑾诱捕器.Views
         }
 
         // 网站列表相关事件
-        private async void BlockToggle_Click(object sender, RoutedEventArgs e)
+        private void BlockToggle_Click(object sender, RoutedEventArgs e)
         {
             // ToggleButton的状态变化会自动触发数据绑定
             // ViewModel会处理IsBlocked属性的变化

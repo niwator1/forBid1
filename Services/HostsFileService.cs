@@ -47,10 +47,10 @@ namespace 崔子瑾诱捕器.Services
                 var backupFileName = $"hosts_backup_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
                 var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
 
-                await File.CopyAsync(_hostsFilePath, backupFilePath);
+                File.Copy(_hostsFilePath, backupFilePath);
                 
                 // 清理旧备份文件（保留最新的10个）
-                await CleanupOldBackupsAsync();
+                CleanupOldBackupsAsync();
 
                 return backupFilePath;
             }
@@ -63,7 +63,7 @@ namespace 崔子瑾诱捕器.Services
         /// <summary>
         /// 清理旧备份文件
         /// </summary>
-        private async Task CleanupOldBackupsAsync()
+        private void CleanupOldBackupsAsync()
         {
             try
             {
@@ -239,7 +239,7 @@ namespace 崔子瑾诱捕器.Services
                     throw new FileNotFoundException("备份文件不存在");
                 }
 
-                await File.CopyAsync(backupFilePath, _hostsFilePath, true);
+                File.Copy(backupFilePath, _hostsFilePath, true);
             }
             catch (Exception ex)
             {
@@ -248,18 +248,5 @@ namespace 崔子瑾诱捕器.Services
         }
     }
 
-    /// <summary>
-    /// File.CopyAsync 扩展方法
-    /// </summary>
-    public static class FileExtensions
-    {
-        public static async Task CopyAsync(string sourceFile, string destinationFile, bool overwrite = false)
-        {
-            using (var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
-            using (var destinationStream = new FileStream(destinationFile, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write))
-            {
-                await sourceStream.CopyToAsync(destinationStream);
-            }
-        }
-    }
+
 }

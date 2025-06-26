@@ -50,7 +50,7 @@ namespace 崔子瑾诱捕器.Services
 
                 return _currentConfig;
             }
-            catch (Exception ex)
+            catch
             {
                 // 如果加载失败，返回默认配置
                 _currentConfig = new AppConfig();
