@@ -1,0 +1,203 @@
+<Window x:Class="崔子瑾诱捕器.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="崔子瑾诱捕器 - 网站访问控制"
+        Width="800" Height="600"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    
+    <Border Background="{StaticResource BackgroundBrush}" 
+            CornerRadius="12" 
+            BorderThickness="1" 
+            BorderBrush="{StaticResource BorderBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 标题栏 -->
+            <Border Grid.Row="0" 
+                    Background="{StaticResource SurfaceBrush}" 
+                    CornerRadius="12,12,0,0">
+                <Grid>
+                    <TextBlock Text="崔子瑾诱捕器 - 网站访问控制" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"
+                               FontWeight="Medium"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    
+                    <!-- 窗口控制按钮 -->
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Right" 
+                                VerticalAlignment="Center"
+                                Margin="0,0,15,0">
+                        <Button x:Name="MinimizeButton" 
+                                Width="12" Height="12"
+                                Style="{StaticResource WindowControlButtonStyle}"
+                                Background="#FFBD2E"
+                                Margin="0,0,8,0"
+                                Click="MinimizeButton_Click"/>
+                        <Button x:Name="CloseButton" 
+                                Width="12" Height="12"
+                                Style="{StaticResource WindowControlButtonStyle}"
+                                Background="#FF5F56"
+                                Click="CloseButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- 主内容区域 -->
+            <Grid Grid.Row="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- 顶部操作栏 -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- 添加网站输入框 -->
+                    <Grid Grid.Column="0">
+                        <TextBox x:Name="AddWebsiteTextBox"
+                                 Style="{StaticResource AppleTextBoxStyle}"
+                                 FontSize="14"
+                                 KeyDown="AddWebsiteTextBox_KeyDown"/>
+                        <TextBlock Text="输入网站地址 (例如: example.com)"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   IsHitTestVisible="False"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=AddWebsiteTextBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    
+                    <!-- 添加按钮 -->
+                    <Button x:Name="AddWebsiteButton" 
+                            Grid.Column="2"
+                            Content="添加网站" 
+                            Style="{StaticResource AppleButtonStyle}"
+                            Padding="15,8"
+                            Click="AddWebsiteButton_Click"/>
+                    
+                    <!-- 一键重置按钮 -->
+                    <Button x:Name="ResetAllButton" 
+                            Grid.Column="4"
+                            Content="一键重置" 
+                            Style="{StaticResource DangerButtonStyle}"
+                            Padding="15,8"
+                            Click="ResetAllButton_Click"/>
+                </Grid>
+                
+                <!-- 网站列表 -->
+                <Border Grid.Row="2" 
+                        Background="{StaticResource SurfaceBrush}" 
+                        CornerRadius="8" 
+                        BorderThickness="1" 
+                        BorderBrush="{StaticResource BorderBrush}">
+                    <ListView x:Name="WebsiteListView" 
+                              ItemsSource="{Binding Websites}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="Transparent" 
+                                        Padding="15,10" 
+                                        Margin="0,0,0,1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="10"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- 网站信息 -->
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding DisplayName}" 
+                                                       FontSize="16" 
+                                                       FontWeight="Medium"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding StatusText}" 
+                                                       FontSize="12" 
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                        
+                                        <!-- 开关按钮 -->
+                                        <ToggleButton x:Name="BlockToggle"
+                                                      Grid.Column="1"
+                                                      IsChecked="{Binding IsBlocked, Mode=TwoWay}"
+                                                      Style="{StaticResource AppleToggleButtonStyle}"
+                                                      Click="BlockToggle_Click"/>
+                                        
+                                        <!-- 删除按钮 -->
+                                        <Button Grid.Column="3"
+                                                Content="删除"
+                                                Style="{StaticResource DangerButtonStyle}"
+                                                Padding="8,4"
+                                                FontSize="12"
+                                                Click="DeleteWebsiteButton_Click"
+                                                Tag="{Binding}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+                
+                <!-- 底部状态栏 -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock x:Name="StatusTextBlock" 
+                               Grid.Column="0"
+                               Text="就绪" 
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                    
+                    <StackPanel Grid.Column="1" 
+                                Orientation="Horizontal">
+                        <TextBlock Text="总计: " 
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding Websites.Count}" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontWeight="Medium"/>
+                        <TextBlock Text=" 个网站，已阻止: " 
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding BlockedCount}" 
+                                   Foreground="{StaticResource DangerBrush}"
+                                   FontWeight="Medium"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
